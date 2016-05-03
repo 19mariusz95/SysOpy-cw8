@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <pthread.h>
 #include <stdlib.h>
+#include <signal.h>
+#include <zconf.h>
 
 int wait = 1;
 
@@ -22,8 +24,13 @@ static void *fun2(void *arg) {
     return (void *) 0;
 }
 
+void handler(int sig) {
+    printf("pid %d, tid %d, sig %d\n", getpid(), (int) pthread_self(), sig);
+}
+
 int main(int argc, char *argv[]) {
 
+    signal(SIGFPE, handler);
     pthread_t *threads = malloc(1000 * sizeof(pthread_t));
     for (int i = 0; i < 999; i++) {
         if (pthread_create(&threads[i], NULL, fun1, NULL) != 0) {
