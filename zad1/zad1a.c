@@ -22,7 +22,6 @@ static void *thread_func(void *arg) {
     pthread_mutex_lock(&mutex);
     size_t rb = fread(r, sizeof(struct record), (size_t) records, file);
     pthread_mutex_unlock(&mutex);
-    printf("%d\n", (int) rb);
     while (rb > 0) {
         for (int i = 0; i < rb; i++) {
             if (strstr(r[i].text, word) != NULL) {

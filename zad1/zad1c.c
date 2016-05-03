@@ -13,10 +13,6 @@ pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 int wait = 1;
 
 static void *thread_func(void *arg) {
-    if (pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL) != 0) {
-        printf("error while setting cancel type\n");
-        exit(-1);
-    }
     while (wait);
     struct record *r = malloc(records * sizeof(struct record));
     pthread_mutex_lock(&mutex);
@@ -27,11 +23,6 @@ static void *thread_func(void *arg) {
             if (strstr(r[i].text, word) != NULL) {
                 printf("found %s, tid: %d record_id:  %d\n", word, (int) pthread_self(), r->id);
                 fflush(stdout);
-                for (int j = 0; j < threads; j++) {
-                    if (thids[j] != pthread_self()) {
-                        pthread_cancel(thids[j]);
-                    }
-                }
                 return (void *) 0;
             }
             pthread_testcancel();
