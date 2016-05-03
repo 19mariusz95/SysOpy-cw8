@@ -10,23 +10,25 @@ int records;
 int threads;
 pthread_t *thids;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+int wait = 1;
 
 static void *thread_func(void *arg) {
     if (pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL) != 0) {
         printf("error while setting cancel type\n");
         exit(-1);
     }
+    while (wait);
     struct record *r = malloc(records * sizeof(struct record));
     pthread_mutex_lock(&mutex);
     size_t rb = fread(r, sizeof(struct record), (size_t) records, file);
     pthread_mutex_unlock(&mutex);
     printf("%d\n", (int) rb);
     while (rb > 0) {
-        printf("%d\n", (int) rb);
         for (int i = 0; i < rb; i++) {
             if (strstr(r[i].text, word) != NULL) {
                 pthread_mutex_lock(&mutex);
-                printf("tid: %d record_id:  %d\n", (int) pthread_self(), r->id);
+                printf("found %s, tid: %d record_id:  %d\n", word, (int) pthread_self(), r->id);
+                fflush(stdout);
                 for (int j = 0; j < threads; j++) {
                     if (thids[j] != pthread_self()) {
                         pthread_cancel(thids[j]);
@@ -37,7 +39,7 @@ static void *thread_func(void *arg) {
             }
         }
         pthread_mutex_lock(&mutex);
-        rb = fread(&r, sizeof(struct record), (size_t) records, file);
+        rb = fread(r, sizeof(struct record), (size_t) records, file);
         pthread_mutex_unlock(&mutex);
     }
     printf("tid: %d not found the word\n", (int) pthread_self());
@@ -69,6 +71,7 @@ int main(int argc, char *argv[]) {
             exit(2);
         }
     }
+    wait = 0;
     for (int i = 0; i < threads; i++) {
         if (pthread_join(thids[i], NULL) != 0) {
             printf("error while waiting for thread\n");
