@@ -3,5 +3,4 @@ project(zad1 C)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
 
-set(SOURCE_FILES main.c)
-add_executable(zad1 ${SOURCE_FILES})
+add_executable(zad1 zad1a.c)
