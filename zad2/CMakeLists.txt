@@ -3,4 +3,5 @@ project(zad2 C)
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -pthread")
 
+add_executable(zad2a zad2a.c)
 add_executable(zad2b zad2b.c)
