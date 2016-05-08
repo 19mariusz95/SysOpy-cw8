@@ -19,6 +19,7 @@ static void *thread_func(void *arg) {
     }
     while (wait);
     struct record *r = malloc(records * sizeof(struct record));
+    pthread_testcancel();
     pthread_mutex_lock(&mutex);
     size_t rb = fread(r, sizeof(struct record), (size_t) records, file);
     pthread_mutex_unlock(&mutex);
@@ -34,12 +35,11 @@ static void *thread_func(void *arg) {
                 }
                 return (void *) 0;
             }
-            pthread_testcancel();
         }
+        pthread_testcancel();
         pthread_mutex_lock(&mutex);
         rb = fread(r, sizeof(struct record), (size_t) records, file);
         pthread_mutex_unlock(&mutex);
-        pthread_testcancel();
     }
     printf("tid: %d not found the word\n", (int) pthread_self());
     fflush(stdout);
@@ -52,7 +52,6 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
     sscanf(argv[1], "%d", &threads);
-    printf("%d\n", threads);
     fflush(stdout);
     char *filename = argv[2];
     sscanf(argv[3], "%d", &records);
@@ -77,6 +76,6 @@ int main(int argc, char *argv[]) {
             exit(3);
         }
     }
-
+    free(thids);
     return 0;
 }
