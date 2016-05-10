@@ -55,7 +55,6 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
     sscanf(argv[1], "%d", &threads);
-    printf("%d\n", threads);
     fflush(stdout);
     char *filename = argv[2];
     sscanf(argv[3], "%d", &records);

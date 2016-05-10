@@ -11,6 +11,8 @@ static void *fun1(void *arg) {
     int tmp = 2;
     for (int i = 0; i < 1000; i++) {
         tmp = tmp * 2 % (tmp / 2 + 1);
+        printf("dzialam\n");
+        sleep(1);
     }
     return (void *) 0;
 }

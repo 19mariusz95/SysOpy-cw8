@@ -10,10 +10,8 @@ int records;
 int threads;
 pthread_t *thids;
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-int wait = 1;
 
 static void *thread_func(void *arg) {
-    while (wait);
     struct record *r = malloc(records * sizeof(struct record));
     pthread_mutex_lock(&mutex);
     size_t rb = fread(r, sizeof(struct record), (size_t) records, file);
@@ -30,8 +28,6 @@ static void *thread_func(void *arg) {
         rb = fread(r, sizeof(struct record), (size_t) records, file);
         pthread_mutex_unlock(&mutex);
     }
-    printf("tid: %d not found the word\n", (int) pthread_self());
-    fflush(stdout);
     return (void *) 0;
 }
 
@@ -53,19 +49,15 @@ int main(int argc, char *argv[]) {
         exit(-2);
     }
     thids = malloc(threads * sizeof(pthread_t));
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
     for (int i = 0; i < threads; i++) {
-        if (pthread_create(&thids[i], NULL, thread_func, NULL) != 0) {
+        if (pthread_create(&thids[i], &attr, thread_func, NULL) != 0) {
             printf("error while creating new thread\n");
             exit(2);
         }
     }
-    wait = 0;
-    for (int i = 0; i < threads; i++) {
-        if (pthread_join(thids[i], NULL) != 0) {
-            printf("error while waiting for thread\n");
-            exit(3);
-        }
-    }
 
-    return 0;
+    pthread_exit(0);
 }
